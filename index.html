@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Feliz Cumpleaños</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --text-color: #ffffff;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  body{
+    min-height:100vh;
+    font-family: 'Patrick Hand', cursive;
+    color:var(--text-color);
+    background:#111;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+
+  .canvas{
+    position:relative;
+    width:460px;
+    height:760px;
+    margin:auto;
+    overflow:hidden;
+    border-radius:16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  }
+
+  /* Fondo: imagen de vegetación cubre todo */
+  .bg{
+    position:absolute;
+    inset:0;
+    background-image: url("img/fondo.png");
+    background-size:cover;
+    background-position:center;
+    z-index:0;
+  }
+
+  /* Overlay oscuro sutil para contraste */
+  .bg::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background: linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.22));
+  }
+
+  /* Título arriba a la izquierda, estilo manuscrito/rúnico */
+  .title{
+    position:absolute;
+    top:22px;
+    left:24px;
+    font-family: 'Patrick Hand', cursive;
+    font-size:42px;
+    font-weight:700;
+    line-height:1.0;
+    color:#fff;
+    text-shadow:
+      2px 2px 0 rgba(0,0,0,0.8),
+      0 0 12px rgba(0,0,0,0.6),
+      3px 3px 8px rgba(0,0,0,0.9);
+    z-index:10;
+    letter-spacing:1px;
+    transform: rotate(-1deg);
+    pointer-events:none;
+  }
+
+  /* Mensaje centrado con fondo negro opaco */
+  .center-message{
+    position:absolute;
+    left:50%;
+    top:44%;
+    transform:translate(-50%,-50%);
+    width:64%;
+    background: rgba(0,0,0,0.88);
+    border-radius:8px;
+    padding:22px 20px;
+    text-align:center;
+    z-index:8;
+    font-family: 'Patrick Hand', cursive;
+  }
+
+  .center-message p{
+    margin:0;
+    font-size:24px;
+    line-height:1.2;
+    color:#fff;
+  }
+
+  .center-message .sub{
+    margin-top:8px;
+    font-size:13px;
+    opacity:0.90;
+    color:#fff;
+  }
+
+  /* Elementos posicionados fijos, como en la imagen */
+  .el{
+    position:absolute;
+    z-index:9;
+    pointer-events:none;
+    filter: drop-shadow(4px 6px 14px rgba(0,0,0,0.6));
+  }
+
+  .el img{
+    display:block;
+    width:100%;
+    height:auto;
+    -webkit-user-drag:none;
+    user-select:none;
+  }
+
+  /* Pinza azul decorativa (clip visual) */
+  .el::after{
+    content:'';
+    position:absolute;
+    top:-6px;
+    left:50%;
+    transform:translateX(-50%);
+    width:10px;
+    height:16px;
+    background:#1a9fff;
+    border-radius:2px 2px 0 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  }
+
+  /* ── POSICIONES ESPECÍFICAS (coinciden con la imagen) ── */
+
+  /* Abeja: arriba izquierda */
+  .abeja{
+    width:88px;
+    top:115px;
+    left:55px;
+    transform:rotate(-10deg);
+  }
+
+  /* Tarántula: arriba derecha */
+  .tarantula{
+    width:125px;
+    top:100px;
+    right:28px;
+    transform:rotate(8deg);
+  }
+
+  /* Mariposa: abajo izquierda, grande */
+  .mariposa{
+    width:155px;
+    bottom:230px;
+    left:18px;
+    transform:rotate(-5deg);
+  }
+
+  /* Orquídea tipo Dracula: centro-derecha */
+  .orquidea{
+    width:105px;
+    bottom:200px;
+    right:38px;
+    transform:rotate(3deg);
+  }
+
+  /* Pinguicula: abajo izquierda-centro */
+  .pinguicula{
+    width:115px;
+    bottom:95px;
+    left:80px;
+    transform:rotate(-3deg);
+  }
+
+  /* Flor de la pasión: abajo centro */
+  .flor-central{
+    width:145px;
+    bottom:50px;
+    left:50%;
+    transform:translateX(-50%) rotate(2deg);
+  }
+
+  /* Orquídea pato: abajo derecha */
+  .pato-orq{
+    width:100px;
+    bottom:130px;
+    right:22px;
+    transform:rotate(-4deg);
+  }
+
+  /* Animación de temblor suave continuo */
+  @keyframes jitter{
+    0%   { transform: var(--base-rot) translate(0px,   0px); }
+    20%  { transform: var(--base-rot) translate(1.5px,-1px); }
+    40%  { transform: var(--base-rot) translate(-2px,  1px); }
+    60%  { transform: var(--base-rot) translate(1px,   2px); }
+    80%  { transform: var(--base-rot) translate(-1px, -1.5px); }
+    100% { transform: var(--base-rot) translate(0px,   0px); }
+  }
+
+  .el{ animation: jitter 3s ease-in-out infinite; }
+  .abeja     { --base-rot: rotate(-10deg); animation-duration:2.8s; animation-delay:0s;   }
+  .tarantula { --base-rot: rotate(8deg);  animation-duration:3.4s; animation-delay:0.5s; }
+  .mariposa  { --base-rot: rotate(-5deg); animation-duration:3.1s; animation-delay:0.2s; }
+  .orquidea  { --base-rot: rotate(3deg);  animation-duration:3.6s; animation-delay:0.8s; }
+  .pinguicula{ --base-rot: rotate(-3deg); animation-duration:2.9s; animation-delay:0.3s; }
+  .flor-central{ --base-rot: rotate(2deg) translateX(-50%); animation-duration:3.3s; animation-delay:0.6s; }
+  .pato-orq  { --base-rot: rotate(-4deg); animation-duration:3.0s; animation-delay:0.9s; }
+
+  @media (max-width:520px){
+    .canvas{ width:100%; max-width:400px; height:auto; aspect-ratio:460/760; }
+    .title{ font-size:32px; top:16px; left:16px; }
+    .center-message{ width:72%; padding:16px; }
+    .center-message p{ font-size:18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="canvas">
+  <div class="bg"></div>
+
+  <h1 class="title">Feliz<br>cumpleaños</h1>
+
+  <!-- ANIMALES — mitad superior -->
+  <div class="el abeja">
+    <img src="img/abeja.png" alt="Abeja">
+  </div>
+
+  <div class="el tarantula">
+    <img src="img/tarantula.png" alt="Tarántula">
+  </div>
+
+  <!-- Mensaje central -->
+  <div class="center-message">
+    <p>Felices 20 añotes,<br>bienvenida al club</p>
+    <div class="sub">Un paso allá que acá — con cariño</div>
+  </div>
+
+  <!-- PLANTAS Y MARIPOSA — mitad inferior -->
+  <div class="el mariposa">
+    <img src="img/mariposa.png" alt="Mariposa">
+  </div>
+
+  <div class="el orquidea">
+    <img src="img/orquidea.png" alt="Orquídea">
+  </div>
+
+  <div class="el pinguicula">
+    <img src="img/pinguicula.png" alt="Pinguicula">
+  </div>
+
+  <div class="el flor-central">
+    <img src="img/flor.png" alt="Flor de la pasión">
+  </div>
+
+  <div class="el pato-orq">
+    <img src="img/pato.png" alt="Pato-Orquídea">
+  </div>
+</div>
+
+</body>
+</html>
