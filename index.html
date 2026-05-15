@@ -340,7 +340,7 @@
   <!-- Mensaje central -->
   <div class="center-message">
     <p>Felices 20 añotes,<br>bienvenida al club</p>
-    <div class="sub">Un paso allá que acá — con cariño</div>
+    <div class="sub">Un paso más allá que acá — con cariño</div>
   </div>
 
   <!-- PLANTAS Y MARIPOSA — mitad inferior -->
@@ -467,7 +467,7 @@
       });
     });
 
-    // Detectar agitación del dispositivo y aumentar vibración
+    // Detectar agitación del dispositivo
     let lastShakeTime = 0;
     window.addEventListener('devicemotion', event => {
       const acceleration = event.accelerationIncludingGravity;
@@ -483,33 +483,13 @@
         const currentTime = Date.now();
         if (totalAcceleration > shakeThreshold && currentTime - lastShakeTime > 1000) {
           lastShakeTime = currentTime;
-
-          // Aumentar vibración de las imágenes
-          document.querySelectorAll('.el').forEach(element => {
-            element.style.animation = 'shake-intense 0.2s infinite';
-          });
-
-          // Restaurar vibración normal después de 1 segundo
-          setTimeout(() => {
-            document.querySelectorAll('.el').forEach(element => {
-              element.style.animation = 'vibrate 1s infinite';
-            });
-          }, 1000);
+          sound.currentTime = 0; // Reinicia el sonido si ya se está reproduciendo
+          sound.play();
         }
       }
     });
   });
 </script>
-
-<style>
-  @keyframes shake-intense {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(5px, -5px); }
-    50% { transform: translate(-5px, 5px); }
-    75% { transform: translate(5px, 5px); }
-    100% { transform: translate(-5px, -5px); }
-  }
-</style>
 
 </body>
 </html>
