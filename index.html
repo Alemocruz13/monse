@@ -459,14 +459,57 @@
   document.addEventListener('DOMContentLoaded', () => {
     const sound = new Audio('sound.mp3');
 
+    // Reproducir sonido al presionar elementos
     document.querySelectorAll('.el').forEach(element => {
       element.addEventListener('mousedown', () => {
         sound.currentTime = 0; // Reinicia el sonido si ya se está reproduciendo
         sound.play();
       });
     });
+
+    // Detectar agitación del dispositivo y aumentar vibración
+    let lastShakeTime = 0;
+    window.addEventListener('devicemotion', event => {
+      const acceleration = event.accelerationIncludingGravity;
+      const shakeThreshold = 15; // Sensibilidad de la agitación
+
+      if (acceleration) {
+        const totalAcceleration = Math.sqrt(
+          acceleration.x * acceleration.x +
+          acceleration.y * acceleration.y +
+          acceleration.z * acceleration.z
+        );
+
+        const currentTime = Date.now();
+        if (totalAcceleration > shakeThreshold && currentTime - lastShakeTime > 1000) {
+          lastShakeTime = currentTime;
+
+          // Aumentar vibración de las imágenes
+          document.querySelectorAll('.el').forEach(element => {
+            element.style.animation = 'shake-intense 0.2s infinite';
+          });
+
+          // Restaurar vibración normal después de 1 segundo
+          setTimeout(() => {
+            document.querySelectorAll('.el').forEach(element => {
+              element.style.animation = 'vibrate 1s infinite';
+            });
+          }, 1000);
+        }
+      }
+    });
   });
 </script>
+
+<style>
+  @keyframes shake-intense {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(5px, -5px); }
+    50% { transform: translate(-5px, 5px); }
+    75% { transform: translate(5px, 5px); }
+    100% { transform: translate(-5px, -5px); }
+  }
+</style>
 
 </body>
 </html>
