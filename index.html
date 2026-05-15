@@ -8,228 +8,332 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
 
 <style>
-  :root{
+  :root {
     --text-color: #ffffff;
   }
 
-  *{box-sizing:border-box;margin:0;padding:0}
-
-  body{
-    min-height:100vh;
-    font-family: 'Patrick Hand', cursive;
-    color:var(--text-color);
-    background:#111;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
-  .canvas{
-    position:relative;
-    width:460px;
-    height:760px;
-    margin:auto;
-    overflow:hidden;
-    border-radius:16px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  body {
+    min-height: 100vh;
+    font-family: 'Patrick Hand', cursive;
+    color: var(--text-color);
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow: hidden; /* Evitar scroll mientras se arrastran elementos en móvil */
+  }
+
+  .canvas {
+    position: relative;
+    width: 460px;
+    height: 760px;
+    margin: auto;
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
   }
 
   /* Fondo: imagen de vegetación cubre todo */
-  .bg{
-    position:absolute;
-    inset:0;
+  .bg {
+    position: absolute;
+    inset: 0;
     background-image: url("img/fondo.png");
-    background-size:cover;
-    background-position:center;
-    z-index:0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
   }
 
   /* Overlay oscuro sutil para contraste */
-  .bg::after{
+  .bg::after {
     content:'';
-    position:absolute;
-    inset:0;
+    position: absolute;
+    inset: 0;
     background: linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.22));
   }
 
   /* Título arriba a la izquierda, estilo manuscrito/rúnico */
-  .title{
-    position:absolute;
-    top:22px;
-    left:24px;
+  .title {
+    position: absolute;
+    top: 22px;
+    left: 24px;
     font-family: 'Patrick Hand', cursive;
-    font-size:42px;
-    font-weight:700;
-    line-height:1.0;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.0;
     color:#fff;
     text-shadow:
       2px 2px 0 rgba(0,0,0,0.8),
       0 0 12px rgba(0,0,0,0.6),
       3px 3px 8px rgba(0,0,0,0.9);
-    z-index:10;
-    letter-spacing:1px;
+    z-index: 10;
+    letter-spacing: 1px;
     transform: rotate(-1deg);
-    pointer-events:none;
+    pointer-events: none;
   }
 
   /* Mensaje centrado con fondo negro opaco */
-  .center-message{
-    position:absolute;
-    left:50%;
-    top:44%;
-    transform:translate(-50%,-50%);
-    width:64%;
-    background: rgba(0,0,0,0.88);
-    border-radius:8px;
-    padding:22px 20px;
-    text-align:center;
-    z-index:8;
+  .center-message {
+    position: absolute;
+    left: 50%;
+    top: 44%;
+    transform: translate(-50%,-50%);
+    width: 64%;
+    background: rgba(22, 41, 6, 0.88);
+    border-radius: 8px;
+    padding: 22px 20px;
+    text-align: center;
+    z-index: 8;
     font-family: 'Patrick Hand', cursive;
+    pointer-events: none; /* Dejar pasar los clicks si algo se arrastra debajo */
   }
 
-  .center-message p{
-    margin:0;
-    font-size:24px;
-    line-height:1.2;
+  .center-message p {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.2;
     color:#fff;
   }
 
-  .center-message .sub{
-    margin-top:8px;
-    font-size:13px;
-    opacity:0.90;
+  .center-message .sub {
+    margin-top: 8px;
+    font-size: 13px;
+    opacity: 0.90;
     color:#fff;
   }
 
   /* Elementos posicionados fijos, como en la imagen */
-  .el{
-    position:absolute;
-    z-index:9;
-    pointer-events:none;
+  .el {
+    position: absolute;
+    z-index: 9;
     filter: drop-shadow(4px 6px 14px rgba(0,0,0,0.6));
+    cursor: grab; /* Indica que se puede arrastrar */
+    -webkit-user-select: none; /* Evitar selección de texto al arrastrar */
+    user-select: none;
+    -webkit-user-drag: none; /* Evitar comportamiento de arrastre nativo de imagen */
+    animation: vibrate 1s infinite;
   }
 
-  .el img{
-    display:block;
-    width:100%;
-    height:auto;
-    -webkit-user-drag:none;
-    user-select:none;
+  .el img {
+    display: block;
+    width: 100%;
+    height: auto;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none; /* Importante para que el JS detecte el click en el div .el */
   }
 
-  /* Pinza azul decorativa (clip visual) */
-  .el::after{
-    content:'';
-    position:absolute;
-    top:-6px;
-    left:50%;
-    transform:translateX(-50%);
-    width:10px;
-    height:16px;
-    background:#1a9fff;
-    border-radius:2px 2px 0 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-  }
+  /* GORRO AZUL ELIMINADO -- Se ha quitado el bloque .el::after */
 
   /* ── POSICIONES ESPECÍFICAS (coinciden con la imagen) ── */
 
   /* Abeja: arriba izquierda */
-  .abeja{
-    width:88px;
-    top:115px;
-    left:55px;
-    transform:rotate(-10deg);
+  .abeja {
+    width: 88px;
+    top: 115px;
+    left: 55px;
+    transform: rotate(-10deg);
   }
 
   /* Tarántula: arriba derecha */
-  .tarantula{
-    width:125px;
-    top:100px;
-    right:28px;
-    transform:rotate(8deg);
+  .tarantula {
+    width: 125px;
+    top: 100px;
+    right: 28px;
+    transform: rotate(8deg);
   }
 
   /* Mariposa: abajo izquierda, grande */
-  .mariposa{
-    width:155px;
-    bottom:230px;
-    left:18px;
-    transform:rotate(-5deg);
+  .mariposa {
+    width: 155px;
+    bottom: 230px;
+    left: 18px;
+    transform: rotate(-5deg);
   }
 
   /* Orquídea tipo Dracula: centro-derecha */
-  .orquidea{
-    width:105px;
-    bottom:200px;
-    right:38px;
-    transform:rotate(3deg);
+  .orquidea {
+    width: 105px;
+    bottom: 200px;
+    right: 38px;
+    transform: rotate(3deg);
   }
 
   /* Pinguicula: abajo izquierda-centro */
-  .pinguicula{
-    width:115px;
-    bottom:95px;
-    left:80px;
-    transform:rotate(-3deg);
+  .pinguicula {
+    width: 115px;
+    bottom: 95px;
+    left: 80px;
+    transform: rotate(-3deg);
   }
 
   /* Flor de la pasión: abajo centro */
-  .flor-central{
-    width:145px;
-    bottom:50px;
-    left:50%;
-    transform:translateX(-50%) rotate(2deg);
+  .flor-central {
+    width: 145px;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%) rotate(2deg);
   }
 
   /* Orquídea pato: abajo derecha */
-  .pato-orq{
-    width:100px;
-    bottom:130px;
-    right:22px;
-    transform:rotate(-4deg);
+  .pato-orq {
+    width: 100px;
+    bottom: 130px;
+    right: 22px;
+    transform: rotate(-4deg);
   }
 
-  /* Animación de temblor suave continuo */
-  @keyframes jitter{
-    0%   { transform: var(--base-rot) translate(0px,   0px); }
-    20%  { transform: var(--base-rot) translate(1.5px,-1px); }
-    40%  { transform: var(--base-rot) translate(-2px,  1px); }
-    60%  { transform: var(--base-rot) translate(1px,   2px); }
-    80%  { transform: var(--base-rot) translate(-1px, -1.5px); }
-    100% { transform: var(--base-rot) translate(0px,   0px); }
+  /* ANIMACIONES ELIMINADAS PARA UN ARRASTRE MÁS LIMPIO */
+
+  /* Clase CSS para el elemento que se está arrastrando actualmente */
+  .el.is-dragging {
+    opacity: 0.8;
+    z-index: 1000 !important; /* Asegurar que esté por encima de todos */
+    cursor: grabbing; /* Cambiar puntero */
+    filter: drop-shadow(8px 12px 20px rgba(0,0,0,0.5)); /* Sombra más pronunciada para el "vuelo" */
   }
 
-  .el{ animation: jitter 3s ease-in-out infinite; }
-  .abeja     { --base-rot: rotate(-10deg); animation-duration:2.8s; animation-delay:0s;   }
-  .tarantula { --base-rot: rotate(8deg);  animation-duration:3.4s; animation-delay:0.5s; }
-  .mariposa  { --base-rot: rotate(-5deg); animation-duration:3.1s; animation-delay:0.2s; }
-  .orquidea  { --base-rot: rotate(3deg);  animation-duration:3.6s; animation-delay:0.8s; }
-  .pinguicula{ --base-rot: rotate(-3deg); animation-duration:2.9s; animation-delay:0.3s; }
-  .flor-central{ --base-rot: rotate(2deg) translateX(-50%); animation-duration:3.3s; animation-delay:0.6s; }
-  .pato-orq  { --base-rot: rotate(-4deg); animation-duration:3.0s; animation-delay:0.9s; }
+  @keyframes vibrate {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(1px, -1px); }
+    50% { transform: translate(-1px, 1px); }
+    75% { transform: translate(1px, 1px); }
+    100% { transform: translate(-1px, -1px); }
+  }
 
-  @media (max-width:520px){
-    .canvas{ width:100%; max-width:400px; height:auto; aspect-ratio:460/760; }
-    .title{ font-size:32px; top:16px; left:16px; }
-    .center-message{ width:72%; padding:16px; }
-    .center-message p{ font-size:18px; }
+  @keyframes vibrate-abeja {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(1px, -1px); }
+    40% { transform: translate(-1px, 2px); }
+    60% { transform: translate(2px, 1px); }
+    80% { transform: translate(-2px, -1px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes vibrate-tarantula {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-2px, 1px); }
+    50% { transform: translate(2px, -2px); }
+    75% { transform: translate(-1px, 2px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes vibrate-mariposa {
+    0% { transform: translate(0, 0); }
+    15% { transform: translate(2px, -2px); }
+    30% { transform: translate(-2px, 1px); }
+    45% { transform: translate(1px, -1px); }
+    60% { transform: translate(-1px, 2px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes vibrate-orquidea {
+    0% { transform: translate(0, 0); }
+    10% { transform: translate(-1px, 1px); }
+    30% { transform: translate(2px, -2px); }
+    50% { transform: translate(-2px, 2px); }
+    70% { transform: translate(1px, -1px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes vibrate-pinguicula {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(1px, -2px); }
+    40% { transform: translate(-1px, 1px); }
+    60% { transform: translate(2px, -1px); }
+    80% { transform: translate(-2px, 2px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes vibrate-flor-central {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-2px, 2px); }
+    50% { transform: translate(2px, -1px); }
+    75% { transform: translate(-1px, 1px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  @keyframes vibrate-pato-orq {
+    0% { transform: translate(0, 0); }
+    15% { transform: translate(1px, -1px); }
+    35% { transform: translate(-2px, 2px); }
+    55% { transform: translate(2px, -2px); }
+    75% { transform: translate(-1px, 1px); }
+    100% { transform: translate(0, 0); }
+  }
+
+  .abeja {
+    animation: vibrate-abeja 1.2s infinite;
+  }
+
+  .tarantula {
+    animation: vibrate-tarantula 1.4s infinite;
+  }
+
+  .mariposa {
+    animation: vibrate-mariposa 1.1s infinite;
+  }
+
+  .orquidea {
+    animation: vibrate-orquidea 1.3s infinite;
+  }
+
+  .pinguicula {
+    animation: vibrate-pinguicula 1.5s infinite;
+  }
+
+  .flor-central {
+    animation: vibrate-flor-central 1.2s infinite;
+  }
+
+  .pato-orq {
+    animation: vibrate-pato-orq 1.6s infinite;
+  }
+
+  @media (max-width: 520px) {
+    .canvas {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      aspect-ratio: 460 / 760;
+    }
+
+    .title {
+      font-size: 32px;
+      top: 16px;
+      left: 16px;
+    }
+
+    .center-message {
+      width: 72%;
+      padding: 16px;
+    }
+
+    .center-message p {
+      font-size: 18px;
+    }
   }
 </style>
 </head>
 <body>
 
-<div class="canvas">
+<div class="canvas" id="canvas-container">
   <div class="bg"></div>
 
   <h1 class="title">Feliz<br>cumpleaños</h1>
 
   <!-- ANIMALES — mitad superior -->
-  <div class="el abeja">
+  <div class="el abeja" data-name="Abeja">
     <img src="img/abeja.png" alt="Abeja">
   </div>
 
-  <div class="el tarantula">
+  <div class="el tarantula" data-name="Tarántula">
     <img src="img/tarantula.png" alt="Tarántula">
   </div>
 
@@ -240,26 +344,129 @@
   </div>
 
   <!-- PLANTAS Y MARIPOSA — mitad inferior -->
-  <div class="el mariposa">
+  <div class="el mariposa" data-name="Mariposa">
     <img src="img/mariposa.png" alt="Mariposa">
   </div>
 
-  <div class="el orquidea">
+  <div class="el orquidea" data-name="Orquídea">
     <img src="img/orquidea.png" alt="Orquídea">
   </div>
 
-  <div class="el pinguicula">
+  <div class="el pinguicula" data-name="Pinguicula">
     <img src="img/pinguicula.png" alt="Pinguicula">
   </div>
 
-  <div class="el flor-central">
+  <div class="el flor-central" data-name="Flor central">
     <img src="img/flor.png" alt="Flor de la pasión">
   </div>
 
-  <div class="el pato-orq">
+  <div class="el pato-orq" data-name="Pato-Orquídea">
     <img src="img/pato.png" alt="Pato-Orquídea">
   </div>
 </div>
+
+<script>
+  const draggables = document.querySelectorAll('.el');
+  const container = document.getElementById('canvas-container');
+  let currentElement = null;
+  let offsetX, offsetY;
+
+  // Funciones de ayuda para obtener la posición, manejando ratón y toque
+  function getPosition(e) {
+    if (e.type.startsWith('touch')) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  function onMouseDown(e) {
+    currentElement = e.currentTarget;
+    const pos = getPosition(e);
+
+    // Calcular el offset: la distancia entre el puntero y la esquina superior izquierda del elemento
+    const rect = currentElement.getBoundingClientRect();
+    offsetX = pos.x - rect.left;
+    offsetY = pos.y - rect.top;
+
+    // Cuando empezamos a arrastrar, necesitamos que el elemento use top/left absolutos.
+    // Muchos elementos originales usan right/bottom. Calculamos la posición absoluta actual.
+    const containerRect = container.getBoundingClientRect();
+    const currentTop = rect.top - containerRect.top;
+    const currentLeft = rect.left - containerRect.left;
+
+    // Aplicar los nuevos estilos para el arrastre
+    currentElement.style.top = currentTop + 'px';
+    currentElement.style.left = currentLeft + 'px';
+    currentElement.style.right = 'auto';   // Desactivar posicionamiento original
+    currentElement.style.bottom = 'auto';
+
+    // Añadir clase visual y subir el z-index
+    currentElement.classList.add('is-dragging');
+
+    // Desactivar animaciones (si las hubiera)
+    // currentElement.style.animation = 'none';
+  }
+
+  function onMouseMove(e) {
+    if (!currentElement) return;
+    e.preventDefault(); // Evitar scroll en móvil mientras se arrastra
+
+    const pos = getPosition(e);
+    
+    // Calcular la nueva posición respecto al contenedor padre
+    const containerRect = container.getBoundingClientRect();
+    let newX = pos.x - containerRect.left - offsetX;
+    let newY = pos.y - containerRect.top - offsetY;
+
+    // Opcional: limitar el arrastre dentro del contenedor
+    // const rect = currentElement.getBoundingClientRect();
+    // if (newX < 0) newX = 0;
+    // if (newY < 0) newY = 0;
+    // if (newX + rect.width > container.offsetWidth) newX = container.offsetWidth - rect.width;
+    // if (newY + rect.height > container.offsetHeight) newY = container.offsetHeight - rect.height;
+
+    // Actualizar la posición del elemento
+    currentElement.style.left = newX + 'px';
+    currentElement.style.top = newY + 'px';
+  }
+
+  function onMouseUp() {
+    if (!currentElement) return;
+    
+    // Quitar clase visual y restaurar z-index
+    currentElement.classList.remove('is-dragging');
+    currentElement = null;
+  }
+
+  // Registrar los escuchas de eventos en cada elemento arrastrable
+  draggables.forEach(el => {
+    // Para ratón
+    el.addEventListener('mousedown', onMouseDown);
+    // Para pantallas táctiles (passive: false es necesario para usar preventDefault())
+    el.addEventListener('touchstart', onMouseDown, { passive: false });
+  });
+
+  // Escuchas de eventos globales para mover y soltar en todo el documento
+  // Para ratón
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+  // Para pantallas táctiles
+  document.addEventListener('touchmove', onMouseMove, { passive: false });
+  document.addEventListener('touchend', onMouseUp);
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sound = new Audio('sound.mp3');
+
+    document.querySelectorAll('.el').forEach(element => {
+      element.addEventListener('mousedown', () => {
+        sound.currentTime = 0; // Reinicia el sonido si ya se está reproduciendo
+        sound.play();
+      });
+    });
+  });
+</script>
 
 </body>
 </html>
